@@ -1,4 +1,26 @@
 const inquirer = require('inquirer');
+const mysql = require('mysql2');
+
+const db = mysql.createConnection(
+    {
+      host: 'localhost',
+      // MySQL username,
+      user: 'root',
+      // TODO: Add MySQL password here
+      password: 'trashaf',
+      database: 'movies_db'
+    },
+    console.log(`Connected to the employees_db database.`)
+  );
+
+const startQuestion = [
+    {
+        type: 'list',
+        message: 'Would you like to view or edit employees??',
+        name: 'start',
+        choices: ['Yes', 'No']
+    }
+];
 
 const commonQuestion = [
     {
@@ -65,10 +87,98 @@ const updateEmployee = [
         type: 'list',
         message: 'Which Employee Role would you like to update?',
         name: 'updatedEmp',
+        choices: []
     },
     {
         type: 'input',
         message: 'What is employees new role? ',
-        name: 'salary',
+        name: 'empNewRole',
     }
 ];
+
+function init() { 
+    inquirer
+        .prompt(startQuestion)
+        .then((val) => {
+            if (val.start === "Yes") {
+                askQuestion()
+            } else {
+                return 'Thank you!'
+            }
+        })
+
+} 
+
+function askQuestion() {
+    inquirer
+        .prompt(commonQuestion)
+        .then((data) => {
+            switch (data) {
+                case 'view all departments': 
+                viewAllDepart(db);
+                    
+                    break;
+
+                case 'view all roles': 
+                viewAllRoles(db);
+                        
+                    break;
+
+                case 'view all employees': 
+                viewAllEmp(db);
+                            
+                    break;
+
+                case 'add a department': 
+                AddDepartment(db);
+                                
+                    break;
+
+                case 'add a role': 
+                AddRoleFunc(db);
+                                    
+                    break;
+
+                case 'add a employee': 
+                AddEmpFunc(db);
+                                        
+                    break;
+
+                case 'update an employee role': 
+                updateEmpFunc(db);
+                                            
+                    break;
+            
+            }
+        })
+}
+
+function viewAllDepart(db) {
+
+}
+
+function viewAllRoles(db) {
+    
+}
+
+function viewAllEmp(db) {
+    
+}
+
+function AddDepartment(db) {
+    
+}
+
+function AddRoleFunc(db) {
+    
+}
+
+function AddEmpFunc(db) {
+    
+}
+
+function updateEmpFunc(db) {
+    
+}
+
+module.exports = init();
