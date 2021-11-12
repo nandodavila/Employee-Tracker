@@ -8,7 +8,7 @@ const db = mysql.createConnection(
       user: 'root',
       // TODO: Add MySQL password here
       password: 'trashaf',
-      database: 'movies_db'
+      database: 'employee_db'
     },
     console.log(`Connected to the employees_db database.`)
   );
@@ -96,10 +96,11 @@ const updateEmployee = [
     }
 ];
 
-function init() { 
-    inquirer
+(async function init() { 
+    await inquirer
         .prompt(startQuestion)
         .then((val) => {
+            console.log(val)
             if (val.start === "Yes") {
                 askQuestion()
             } else {
@@ -107,7 +108,7 @@ function init() {
             }
         })
 
-} 
+} )
 
 function askQuestion() {
     inquirer
@@ -154,6 +155,18 @@ function askQuestion() {
 }
 
 function viewAllDepart(db) {
+    const sql = `SELECT * FROM department`;
+  
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+       return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
 
 }
 
