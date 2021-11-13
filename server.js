@@ -11,7 +11,9 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-init()
+app.get('/', async (req, res)=>{
+  const start = await init()
+})
 // Connect to database
 // const db = mysql.createConnection(
 //   {

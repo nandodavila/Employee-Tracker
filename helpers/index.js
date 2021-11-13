@@ -96,8 +96,8 @@ const updateEmployee = [
     }
 ];
 
-(async function init() { 
-    await inquirer
+function init() { 
+     inquirer
         .prompt(startQuestion)
         .then((val) => {
             console.log(val)
@@ -108,45 +108,46 @@ const updateEmployee = [
             }
         })
 
-} )
+} 
 
 function askQuestion() {
     inquirer
         .prompt(commonQuestion)
         .then((data) => {
+            console.log(data)
             switch (data) {
                 case 'view all departments': 
-                viewAllDepart(db);
+                viewAllDepart();
                     
                     break;
 
                 case 'view all roles': 
-                viewAllRoles(db);
+                viewAllRoles();
                         
                     break;
 
                 case 'view all employees': 
-                viewAllEmp(db);
+                viewAllEmp();
                             
                     break;
 
                 case 'add a department': 
-                AddDepartment(db);
+                AddDepartment();
                                 
                     break;
 
                 case 'add a role': 
-                AddRoleFunc(db);
+                AddRoleFunc();
                                     
                     break;
 
                 case 'add a employee': 
-                AddEmpFunc(db);
+                AddEmpFunc();
                                         
                     break;
 
                 case 'update an employee role': 
-                updateEmpFunc(db);
+                updateEmpFunc();
                                             
                     break;
             
@@ -154,43 +155,45 @@ function askQuestion() {
         })
 }
 
-function viewAllDepart(db) {
-    const sql = `SELECT * FROM department`;
-  
-  db.query(sql, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-       return;
-    }
-    res.json({
-      message: 'success',
-      data: rows
-    });
-  });
+const viewAllDepart = async() => {
+    const sql = `SELECT * FROM department;`;
+    const [row, fields] = await db.execute(sql)
+    console.log(row)
+    console.log(fields)
+//   db.query(sql, (err, rows) => {
+//     if (err) {
+//       res.status(500).json({ error: err.message });
+//        return;
+//     }
+//     res.json({
+//       message: 'success',
+//       data: rows
+//     }); console.table(rows)
+//   });
 
 }
 
-function viewAllRoles(db) {
+function viewAllRoles() {
     
 }
 
-function viewAllEmp(db) {
+function viewAllEmp() {
     
 }
 
-function AddDepartment(db) {
+function AddDepartment() {
     
 }
 
-function AddRoleFunc(db) {
+function AddRoleFunc() {
     
 }
 
-function AddEmpFunc(db) {
+function AddEmpFunc() {
     
 }
 
-function updateEmpFunc(db) {
+function updateEmpFunc() {
     
 }
 
