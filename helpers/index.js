@@ -39,6 +39,8 @@ const addDepart = [
     }
 ];
 
+// const allOfDepart
+
 const addRole = [
     {
         type: 'input',
@@ -54,7 +56,7 @@ const addRole = [
         type: 'list',
         message: 'What department is this role in?',
         name: 'departRole',
-        choices: []
+        choices: [allOfDepart]
     }
 ];
 
@@ -100,11 +102,10 @@ function init() {
      inquirer
         .prompt(startQuestion)
         .then((val) => {
-            console.log(val)
             if (val.start === "Yes") {
                 askQuestion()
             } else {
-                return 'Thank you!'
+                return console.log('thank you')
             }
         })
 
@@ -114,9 +115,9 @@ function askQuestion() {
     inquirer
         .prompt(commonQuestion)
         .then((data) => {
-            console.log(data)
-            switch (data) {
+            switch (data.action) {
                 case 'view all departments': 
+                console.log(data)
                 viewAllDepart();
                     
                     break;
@@ -156,36 +157,75 @@ function askQuestion() {
 }
 
 const viewAllDepart = async() => {
-    const sql = `SELECT * FROM department;`;
-    const [row, fields] = await db.execute(sql)
-    console.log(row)
-    console.log(fields)
-//   db.query(sql, (err, rows) => {
-//     if (err) {
-//       res.status(500).json({ error: err.message });
-//        return;
-//     }
-//     res.json({
-//       message: 'success',
-//       data: rows
-//     }); console.table(rows)
-//   });
+    const sql = `SELECT * FROM department;`
+    db.query(sql, function (err, results) {
+        if (err) {
+            console.error(err)
+        } else {
+        console.table(results)
+        init();
+        }
+      });
 
 }
 
 function viewAllRoles() {
+    const sql = `SELECT roles.title, roles.id, department.name, roles.salary FROM roles RIGHT JOIN department ON roles.depart_id = department.id ORDER BY roles.id;`
+    db.query(sql, function (err, results) {
+        if (err) {
+            console.error(err)
+        } else {
+        console.table(results)
+        init();
+        }
+      });
     
 }
 
 function viewAllEmp() {
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.name, roles.salary FROM employee 
+    JOIN roles ON employee.roles_id = roles.id 
+    JOIN department ON department.id = roles.depart_id;`
+    db.query(sql, function (err, results) {
+        if (err) {
+            console.error(err)
+        } else {
+        console.table(results)
+        init();
+        }
+      });
+    
     
 }
 
 function AddDepartment() {
+    inquirer
+        .prompt(addDepart)
+        .then((data) => {
+            const sql = 'INSERT INTO department (name) VALUES(?);'
+            db.query(sql, data.department, function (err, results) {
+                console.log(results);
+                console.log(`${data.department} has been added to the department table`)
+                init();
+
+        })
     
+})
 }
 
 function AddRoleFunc() {
+    inquirer
+        .prompt(addRole)
+        .then((data) => {
+            const sql = `INSERT INTO roles (title, salary, depart_id) VALUES (${data.role},${data.salary},${data.departRole})`
+            db.query(sql, data.department, function (err, results) {
+                console.log(results);
+                console.log(`${data.role} has been added to the roles table`)
+                init();
+
+        })
+    
+})
     
 }
 
