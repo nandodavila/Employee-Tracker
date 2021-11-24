@@ -247,8 +247,8 @@ async function AddRoleFunc() {
     inquirer
         .prompt(addRole)
         .then((data) => {
-            const sql = `INSERT INTO roles (title, salary, depart_id) VALUES (${data.role},${data.salary},${data.departRole})`
-            db.query(sql, data.role, function (err, results) {
+            const sql = `INSERT INTO roles (title, salary, depart_id) VALUES (?,?,?);`
+            db.query(sql, [data.role, data.salary, data.departRole], function (err, results) {
                 console.log(`${data.role} has been added to the roles table`)
                 init();
 
@@ -262,8 +262,8 @@ async function AddEmpFunc() {
     inquirer
         .prompt(addEmployee)
         .then((data) => {
-            const sql = `INSERT INTO employee (first_name, last_name, roles_id, manager_id) VALUES (${data.fName},${data.lName},${data.empRole},${data.empManager})`
-            db.query(sql, data, function (err, results) {
+            const sql = `INSERT INTO employee (first_name, last_name, roles_id, manager_id) VALUES (?,?,?,?);`
+            db.query(sql, [data.fName, data.lName, data.empRole, data.empManager], function (err, results) {
                 console.log(`${data.fName} ${data.lName} has been added to the Employees table`)
                 init();
 
