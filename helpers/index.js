@@ -39,7 +39,7 @@ const addDepart = [
     }
 ];
 
-// const allOfDepart
+
 
 const addRole = [
     {
@@ -56,7 +56,7 @@ const addRole = [
         type: 'list',
         message: 'What department is this role in?',
         name: 'departRole',
-        choices: [allOfDepart]
+        choices: []
     }
 ];
 
@@ -112,6 +112,11 @@ function init() {
 } 
 
 function askQuestion() {
+    (async function() {const roleChoices = await getAllRoles();
+        addRole[2].choices = roleChoices})();
+
+    (async function() {const managerChoices = await getAllManager();
+        addEmployee[3].choices = managerChoices})();
     inquirer
         .prompt(commonQuestion)
         .then((data) => {
@@ -142,7 +147,7 @@ function askQuestion() {
                                     
                     break;
 
-                case 'add a employee': 
+                case 'add an employee': 
                 AddEmpFunc();
                                         
                     break;
@@ -175,12 +180,25 @@ function viewAllRoles() {
         if (err) {
             console.error(err)
         } else {
+
         console.table(results)
         init();
         }
       });
     
 }
+
+async function getAllRoles() {
+    const sql = `SELECT roles.title, roles.id, department.name, roles.salary FROM roles RIGHT JOIN department ON roles.depart_id = department.id ORDER BY roles.id;`
+    const queryRes = await db.promise().query(sql).then(([ rows ]) => {
+        return rows;
+        })
+        .catch(error => {
+            throw error;
+        });
+    return queryRes.map(qr => qr.name)
+}
+
 
 function viewAllEmp() {
     const sql = `SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.name, roles.salary FROM employee 
@@ -194,8 +212,20 @@ function viewAllEmp() {
         init();
         }
       });
-    
-    
+}
+
+async function getAllManager() {
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.name, employee.manager_id FROM employee
+            JOIN roles ON employee.roles_id = roles.id 
+            JOIN department ON department.id = roles.depart_id
+            WHERE employee.manager_id IS NOT NULL;`
+    const queryRes = await db.promise().query(sql).then(([ rows ]) => {
+        return rows;
+            })
+            .catch(error => {
+                throw error;
+            });
+        return queryRes.map(qr => qr.name)
 }
 
 function AddDepartment() {
@@ -213,13 +243,12 @@ function AddDepartment() {
 })
 }
 
-function AddRoleFunc() {
+async function AddRoleFunc() {
     inquirer
         .prompt(addRole)
         .then((data) => {
             const sql = `INSERT INTO roles (title, salary, depart_id) VALUES (${data.role},${data.salary},${data.departRole})`
-            db.query(sql, data.department, function (err, results) {
-                console.log(results);
+            db.query(sql, data.role, function (err, results) {
                 console.log(`${data.role} has been added to the roles table`)
                 init();
 
@@ -229,7 +258,18 @@ function AddRoleFunc() {
     
 }
 
-function AddEmpFunc() {
+async function AddEmpFunc() {
+    inquirer
+        .prompt(addEmployee)
+        .then((data) => {
+            const sql = `INSERT INTO employee (first_name, last_name, roles_id, manager_id) VALUES (${data.fName},${data.lName},${data.empRole},${data.empManager})`
+            db.query(sql, data, function (err, results) {
+                console.log(`${data.fName} ${data.lName} has been added to the Employees table`)
+                init();
+
+        })
+    
+})
     
 }
 
