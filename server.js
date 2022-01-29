@@ -14,18 +14,19 @@ app.use(express.json());
 app.get('/', async (req, res)=>{
   const start = await init()
 })
+
 // Connect to database
-// const db = mysql.createConnection(
-//   {
-//     host: 'localhost',
-//     // MySQL username,
-//     user: 'root',
-//     // TODO: Add MySQL password here
-//     password: 'trashaf',
-//     database: 'movies_db'
-//   },
-//   console.log(`Connected to the employees_db database.`)
-// );
+const db = mysql.createConnection(
+  {
+    host: 'localhost',
+    // MySQL username,
+    user: 'root',
+    // TODO: Add MySQL password here
+    password: 'trashaf',
+    database: 'employee_db'
+  },
+  console.log(`Connected to the employees_db database.`)
+);
 
 
 

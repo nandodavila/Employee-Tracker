@@ -13,6 +13,11 @@ const db = mysql.createConnection(
     console.log(`Connected to the employees_db database.`)
   );
 
+let deptArray = [];
+let manArray = [];
+let roleArray = [];
+let empArray = [];
+
 const startQuestion = [
     {
         type: 'list',
@@ -72,16 +77,17 @@ const addEmployee = [
         name: 'lName',
     },
     {
-        type: 'input',
+        type: 'list',
         message: 'What is this Employees role?',
         name: 'empRole',
+        choices: [],
     },
     {
         type: 'list',
         message: 'Who is this Employees manager?',
         name: 'empManager',
         choices: []
-    }
+    },
 ];
 
 const updateEmployee = [
@@ -92,9 +98,10 @@ const updateEmployee = [
         choices: []
     },
     {
-        type: 'input',
+        type: 'list',
         message: 'What is employees new role? ',
         name: 'empNewRole',
+        choices: [],
     }
 ];
 
@@ -112,11 +119,35 @@ function init() {
 } 
 
 function askQuestion() {
-    (async function() {const roleChoices = await getAllRoles();
-        addRole[2].choices = roleChoices})();
+    (async function() {const roleChoices = await getAllDept();
+        roleChoices.forEach(departRole => {
+            deptArray.push({name: departRole.name, value: departRole.id})   
+        });
+        addRole[2].choices = deptArray}
+    )();
 
     (async function() {const managerChoices = await getAllManager();
-        addEmployee[3].choices = managerChoices})();
+        managerChoices.forEach(manager => {
+            manArray.push({name: manager.first_name, value: manager.manager_id})
+        })
+        addEmployee[3].choices = manArray}
+    )();
+
+    (async function() {const roleChoices = await getAllRoles();
+        roleChoices.forEach(role => {
+            roleArray.push({name: role.title, value: role.id})
+        })
+        addEmployee[2].choices = roleArray
+        updateEmployee[1].choices = roleArray}
+    )();
+
+    (async function() {const employeeChoices = await getAllEmp();
+        employeeChoices.forEach(employee => {
+            empArray.push({name: employee.first_name, value: employee.id})
+        })
+        updateEmployee[0].choices = empArray}
+    )();
+
     inquirer
         .prompt(commonQuestion)
         .then((data) => {
@@ -188,16 +219,39 @@ function viewAllRoles() {
     
 }
 
-async function getAllRoles() {
-    const sql = `SELECT roles.title, roles.id, department.name, roles.salary FROM roles RIGHT JOIN department ON roles.depart_id = department.id ORDER BY roles.id;`
+async function getAllDept() {
+    const sql = `SELECT department.name, department.id FROM department`
     const queryRes = await db.promise().query(sql).then(([ rows ]) => {
         return rows;
         })
         .catch(error => {
             throw error;
         });
-    return queryRes.map(qr => qr.name)
+    return queryRes;
 }
+
+async function getAllRoles() {
+    const sql = `SELECT roles.title, roles.id FROM roles`
+    const queryRes = await db.promise().query(sql).then(([ rows ]) => {
+        return rows;
+        })
+        .catch(error => {
+            throw error;
+        });
+    return queryRes;
+}
+
+async function getAllEmp() {
+    const sql = `SELECT employee.first_name, employee.id FROM employee`
+    const queryRes = await db.promise().query(sql).then(([ rows ]) => {
+        return rows;
+        })
+        .catch(error => {
+            throw error;
+        });
+    return queryRes;
+}
+
 
 
 function viewAllEmp() {
@@ -215,7 +269,7 @@ function viewAllEmp() {
 }
 
 async function getAllManager() {
-    const sql = `SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.name, employee.manager_id FROM employee
+    const sql = `SELECT employee.first_name, employee.manager_id FROM employee
             JOIN roles ON employee.roles_id = roles.id 
             JOIN department ON department.id = roles.depart_id
             WHERE employee.manager_id IS NOT NULL;`
@@ -225,7 +279,7 @@ async function getAllManager() {
             .catch(error => {
                 throw error;
             });
-        return queryRes.map(qr => qr.name)
+        return queryRes;
 }
 
 function AddDepartment() {
@@ -274,6 +328,18 @@ async function AddEmpFunc() {
 }
 
 function updateEmpFunc() {
+    inquirer
+        .prompt(updateEmployee)
+        .then((data) => {
+            const sql = `UPDATE employee SET roles_id = ? WHERE id = ?;`
+            db.query(sql, [data.empNewRole, data.updatedEmp], function (err, results) {
+                console.log(`Employee updated`)
+                init();
+
+        })
+    
+})
+    
     
 }
 
